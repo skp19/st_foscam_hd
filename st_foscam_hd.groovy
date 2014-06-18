@@ -15,6 +15,7 @@
  *    - Go to and set preset locations
  *    - Enable cruise maps
  *    - Control PTZ
+ *    - Reboot
  *
  *  Capability: Image Capture, Polling
  *  Custom Attributes: setStatus, alarmStatus, ledStatus
@@ -64,11 +65,17 @@ metadata {
 	command "ledOn"
 	command "ledOff"
 	command "ledAuto"
+	command "reboot"
   }
 
   tiles {
     carouselTile("cameraDetails", "device.image", width: 3, height: 2) { }
 
+	standardTile("foscam", "device.alarmStatus", width: 1, height: 1, canChangeIcon: true, inactiveLabel: true, canChangeBackground: false) {
+      state "off", label: "off", action: "toggleAlarm", icon: "st.camera.dropcam-centered", backgroundColor: "#FFFFFF"
+      state "on", label: "on", action: "toggleAlarm", icon: "st.camera.dropcam-centered",  backgroundColor: "#53A7C0"
+    }
+	
     standardTile("camera", "device.image", width: 1, height: 1, canChangeIcon: false, inactiveLabel: true, canChangeBackground: false) {
       state "default", label: "", action: "Image Capture.take", icon: "st.camera.dropcam-centered", backgroundColor: "#FFFFFF"
     }
@@ -77,13 +84,13 @@ metadata {
       state "take", label: "", action: "Image Capture.take", icon: "st.secondary.take", nextState:"taking"
     }
 
-    standardTile("up", "device.image", width: 1, height: 1, canChangeIcon: false,  canChangeBackground: false, decoration: "flat") {
-      state "up", label: "up", action: "up", icon: ""
+    standardTile("up", "device.image", width: 1, height: 1, canChangeIcon: false, canChangeBackground: false, decoration: "flat") {
+      state "up", label: "up", action: "up", icon: "st.thermostat.thermostat-up"
     }
 
     standardTile("alarmStatus", "device.alarmStatus", width: 1, height: 1, canChangeIcon: false, inactiveLabel: true, canChangeBackground: false) {
-      state "off", label: "off", action: "toggleAlarm", icon: "st.camera.dropcam-centered", backgroundColor: "#FFFFFF"
-      state "on", label: "on", action: "toggleAlarm", icon: "st.camera.dropcam-centered",  backgroundColor: "#53A7C0"
+      state "off", label: "off", action: "toggleAlarm", icon: "st.quirky.spotter.quirky-spotter-sound-off", backgroundColor: "#FFFFFF"
+      state "on", label: "on", action: "toggleAlarm", icon: "st.quirky.spotter.quirky-spotter-sound-on",  backgroundColor: "#53A7C0"
     }
 
 	standardTile("preset1", "device.image", width: 1, height: 1, canChangeIcon: false, canChangeBackground: false, decoration: "flat") {
@@ -103,7 +110,7 @@ metadata {
     }
 
     standardTile("stop", "device.image", width: 1, height: 1, canChangeIcon: false,  canChangeBackground: false, decoration: "flat") {
-      state "stop", label: "stop", action: "stop", icon: ""
+      state "stop", label: "", action: "stop", icon: "st.sonos.stop-btn"
     }
     
     standardTile("right", "device.image", width: 1, height: 1, canChangeIcon: false,  canChangeBackground: false, decoration: "flat") {
@@ -115,7 +122,7 @@ metadata {
     }
 
     standardTile("down", "device.image", width: 1, height: 1, canChangeIcon: false, canChangeBackground: false, decoration: "flat") {
-      state "down", label: "down", action: "down", icon: ""
+      state "down", label: "down", action: "down", icon: "st.thermostat.thermostat-down"
     }
 
     standardTile("cruisemap1", "device.image", width: 1, height: 1, canChangeIcon: false, canChangeBackground: false, decoration: "flat") {
@@ -123,7 +130,7 @@ metadata {
     }
 
     standardTile("cruisemap2", "device.image", width: 1, height: 1, canChangeIcon: false, canChangeBackground: false, decoration: "flat") {
-      state "cruisemap2", label: "Cruise Map 1", action: "cruisemap2", icon: ""
+      state "cruisemap2", label: "Cruise Map 2", action: "cruisemap2", icon: ""
     }
 	
     standardTile("set", "device.setStatus", width: 1, height: 1, canChangeIcon: false, inactiveLabel: true, canChangeBackground: false) {
@@ -138,12 +145,16 @@ metadata {
 	standardTile("ledStatus", "device.ledStatus", width: 1, height: 1, canChangeIcon: false, inactiveLabel: true, canChangeBackground: false) {
       state "auto", label: "auto", action: "toggleLED", icon: "st.Lighting.light13", backgroundColor: "#53A7C0"
 	  state "off", label: "off", action: "toggleLED", icon: "st.Lighting.light13", backgroundColor: "#FFFFFF"
-      state "on", label: "on", action: "toggleLED", icon: "st.Lighting.light13", backgroundColor: "#FFFF00"
+      state "on", label: "on", action: "toggleLED", icon: "st.Lighting.light11", backgroundColor: "#FFFF00"
 	  state "manual", label: "manual", action: "toggleLED", icon: "st.Lighting.light13", backgroundColor: "#FFFF00"
     }
 	
-    main "alarmStatus"
-      details(["cameraDetails", "take", "ledStatus", "alarmStatus", "preset1", "preset2", "preset3", "cruisemap1", "up", "cruisemap2", "left", "stop", "right", "blank", "down", ,"blank", "refresh", "set"])
+	standardTile("reboot", "device.image", inactiveLabel: false, decoration: "flat") {
+      state "reboot", label: "reboot", action: "reboot", icon: "st.Health & Wellness.health8"
+    }
+	
+    main "foscam"
+      details(["cameraDetails", "take", "ledStatus", "alarmStatus", "preset1", "preset2", "preset3", "cruisemap1", "up", "cruisemap2", "left", "stop", "right", "blank", "down", ,"blank", "refresh", "set", "reboot"])
   }
 }
 
@@ -192,48 +203,50 @@ def alarmOff() {
 
 def left() {
   api("decoder_control", "cmd=ptzMoveLeft") {
-    log.debug("Executing 'left'")
+    log.debug("Executing 'LEFT'")
   }
   stop()
 }
 
 def right() {
   api("decoder_control", "cmd=ptzMoveRight") {
-    log.debug("Executing 'right'")
+    log.debug("Executing 'RIGHT'")
   }
   stop()
 }
 
 def up() {
   api("decoder_control", "cmd=ptzMoveUp") {
-    log.debug("Executing 'up'")
+    log.debug("Executing 'UP'")
   }
   stop()
 }
 
 def down() {
   api("decoder_control", "cmd=ptzMoveDown") {
-    log.debug("Executing 'down'")
+    log.debug("Executing 'DOWN'")
   }
   stop()
 }
 
 def stop() {
-  api("decoder_control", "cmd=ptzStopRun") {}
+  api("decoder_control", "cmd=ptzStopRun") {
+    log.debug("Executing 'STOP'")
+  }
 }
 
 def preset1() {
-  log.debug("Preset 1 Pressed - ${preset1}")
+  log.debug("Preset 1 Selected - ${preset1}")
   preset("${preset1}")
 }
 
 def preset2() {
-  log.debug("Preset 2 Pressed - ${preset2}")
+  log.debug("Preset 2 Selected - ${preset2}")
   preset("${preset2}")
 }
 
 def preset3() {
-  log.debug("Preset 3 Pressed - ${preset3}")
+  log.debug("Preset 3 Selected - ${preset3}")
   preset("${preset3}")
 }
 
@@ -279,7 +292,7 @@ def addPreset(def presetname) {
 
 //Toggle the the mode to set the preset
 def set() {
-  if(device.currentValue("setStatus") == "set") {
+  if((device.currentValue("setStatus") == "set").or(device.currentValue("setStatus") == "")) {
     log.debug("Entering Add Preset Mode")
     sendEvent(name: "setStatus", value: "add");
   }
@@ -291,12 +304,12 @@ def set() {
 }
 
 def cruisemap1() {
-  log.debug("Cruise Map 1 Pressed - ${cruisemap1}")
+  log.debug("Cruise Map 1 Selected - ${cruisemap1}")
   cruise("${cruisemap1}")
 }
 
 def cruisemap2() {
-  log.debug("Cruise Map 2 Pressed - ${cruisemap2}")
+  log.debug("Cruise Map 2 Selected - ${cruisemap2}")
   cruise("${cruisemap2}")
 }
 
@@ -350,6 +363,12 @@ def ledAuto() {
   }
 }
 
+def reboot() {
+  api("reboot", "") {
+    log.debug("Rebooting")
+  }
+}
+
 def api(method, args = [], success = {}) {
   def methods = [
     "decoder_control": [uri: "http://${ip}:${port}/cgi-bin/CGIProxy.fcgi${login()}&${args}",                                type: "get"],
@@ -375,31 +394,37 @@ private login() {
 }
 
 def poll() {
+  //Poll Motion Alarm Status
   api("get_params", "cmd=getMotionDetectConfig") {
-    it.data.eachLine {
-      if(it.startsWith("    <isEnable>0</isEnable>")) {
-        log.info("Polled: Alarm off")
-        sendEvent(name: "alarmStatus", value: "off");
-      }
+    def CGI_Result = new XmlParser().parse(it.data)
+	def motionAlarm = CGI_Result.isEnable.text()
 
-      if(it.startsWith("    <isEnable>1</isEnable>")) {
-        log.info("Polled: Alarm on")
+	if(motionAlarm == "0") {
+      log.info("Polled: Alarm Off")
+      sendEvent(name: "alarmStatus", value: "off");
+    }
+
+    if(motionAlarm == "1") {
+        log.info("Polled: Alarm On")
         sendEvent(name: "alarmStatus", value: "on");
-      }
+	}
+  }
+  
+  //Poll IR LED Mode
+  api("get_params", "cmd=getInfraLedConfig") {
+    def CGI_Result = new XmlParser().parse(it.data)
+	def ledMode = CGI_Result.mode.text()
+  
+    if(ledMode == "0") {
+      log.info("Polled: LED Mode Auto")
+      sendEvent(name: "ledStatus", value: "auto");
+    }
+
+    if(ledMode == "1") {
+      log.info("Polled: LED Mode Manual")
+      sendEvent(name: "ledStatus", value: "manual");
     }
   }
   
-  api("get_params", "cmd=getInfraLedConfig") {
-    it.data.eachLine {
-      if(it.startsWith("    <mode>0</mode>")) {
-        log.info("Polled: LED auto")
-        sendEvent(name: "ledStatus", value: "auto");
-      }
-
-      if(it.startsWith("    <mode>1</mode>")) {
-        log.info("Polled: LED manual")
-        sendEvent(name: "ledStatus", value: "manual");
-      }
-    }
-  }
+  //Reset 
 }
