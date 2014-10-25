@@ -188,18 +188,73 @@ def toggleAlarm() {
 }
 
 def alarmOn() {
-  api("set_alarm", "isEnable=1") {
+  api("get_params", "cmd=getMotionDetectConfig") {
+    def CGI_Result = new XmlParser().parse(it.data)
+	def a_data = CGI_Result.linkage.text()
+	def b_data = CGI_Result.snapInterval.text()
+    def c_data = CGI_Result.sensitivity.text()
+    def d_data = CGI_Result.triggerInterval.text()
+    def s0 = CGI_Result.schedule0.text()
+    def s1 = CGI_Result.schedule1.text()
+    def s2 = CGI_Result.schedule2.text()
+    def s3 = CGI_Result.schedule3.text()
+    def s4 = CGI_Result.schedule4.text()
+    def s5 = CGI_Result.schedule5.text()
+    def s6 = CGI_Result.schedule6.text()
+    def a0 = CGI_Result.area0.text()
+    def a1 = CGI_Result.area1.text()
+    def a2 = CGI_Result.area2.text()
+    def a3 = CGI_Result.area3.text()
+    def a4 = CGI_Result.area4.text()
+    def a5 = CGI_Result.area5.text()
+    def a6 = CGI_Result.area6.text()
+    def a7 = CGI_Result.area7.text()
+    def a8 = CGI_Result.area8.text()
+    def a9 = CGI_Result.area9.text()
+    
+    def AlarmData = "isEnable=1&linkage=${a_data}&snapInterval=${b_data}&sensitivity=${c_data}&triggerInterval=${d_data}&schedule0=${s0}&schedule1=${s1}&schedule2=${s2}&schedule3=${s3}&schedule4=${s4}&schedule5=${s5}&schedule6=${s6}&area0=${a0}&area1=${a1}&area2=${a2}&area3=${a3}&area4=${a4}&area5=${a5}&area6=${a6}&area7=${a7}&area8=${a8}&area9=${a09}"
+    
+  api("set_alarm", "${AlarmData}") {  ///Changed from "isEnable=1" to "${AlarmData}"
     log.debug("Alarm changed to: on")
     sendEvent(name: "alarmStatus", value: "on");
+  }
   }
 }
 
 def alarmOff() {
-  api("set_alarm", "isEnable=0") {
+  api("get_params", "cmd=getMotionDetectConfig") {
+    def CGI_Result = new XmlParser().parse(it.data)
+	def a_data = CGI_Result.linkage.text()
+	def b_data = CGI_Result.snapInterval.text()
+    def c_data = CGI_Result.sensitivity.text()
+    def d_data = CGI_Result.triggerInterval.text()
+    def s0 = CGI_Result.schedule0.text()
+    def s1 = CGI_Result.schedule1.text()
+    def s2 = CGI_Result.schedule2.text()
+    def s3 = CGI_Result.schedule3.text()
+    def s4 = CGI_Result.schedule4.text()
+    def s5 = CGI_Result.schedule5.text()
+    def s6 = CGI_Result.schedule6.text()
+    def a0 = CGI_Result.area0.text()
+    def a1 = CGI_Result.area1.text()
+    def a2 = CGI_Result.area2.text()
+    def a3 = CGI_Result.area3.text()
+    def a4 = CGI_Result.area4.text()
+    def a5 = CGI_Result.area5.text()
+    def a6 = CGI_Result.area6.text()
+    def a7 = CGI_Result.area7.text()
+    def a8 = CGI_Result.area8.text()
+    def a9 = CGI_Result.area9.text()
+    
+    def AlarmData = "isEnable=0&linkage=${a_data}&snapInterval=${b_data}&sensitivity=${c_data}&triggerInterval=${d_data}&schedule0=${s0}&schedule1=${s1}&schedule2=${s2}&schedule3=${s3}&schedule4=${s4}&schedule5=${s5}&schedule6=${s6}&area0=${a0}&area1=${a1}&area2=${a2}&area3=${a3}&area4=${a4}&area5=${a5}&area6=${a6}&area7=${a7}&area8=${a8}&area9=${a09}"
+  
+  api("set_alarm", "${AlarmData}") {  ///Changed from "isEnable=1" to "${AlarmData}"
     log.debug("Alarm changed to: off")
     sendEvent(name: "alarmStatus", value: "off");
   }
+  }
 }
+
 
 def left() {
   api("decoder_control", "cmd=ptzMoveLeft") {
